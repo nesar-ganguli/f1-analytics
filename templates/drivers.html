@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Drivers | Drive to Survive</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .driver-card {
+            border: 1px solid red;
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin: 10px auto;
+            background: #111;
+            color: white;
+            max-width: 800px;
+        }
+
+        .driver-card:hover {
+            background-color: #222;
+        }
+
+        .form-container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid red;
+            border-radius: 10px;
+            background-color: #111;
+        }
+
+        .form-container input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #222;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background: red;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #filterInput {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            margin: 20px auto;
+            display: block;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    {% include "navbar.html" %}
+    <main style="padding: 30px;">
+        <h2 style="color:white;">👨‍✈️ All Drivers</h2>
+        <input type="text" id="filterInput" placeholder="Search by driver name or nationality..." />
+        <div id="driverList"></div>
+
+        <div class="form-container">
+            <h3 style="color:white;">➕ Add New Driver</h3>
+            <form id="addDriverForm">
+                <input type="text" name="driverRef" placeholder="Driver Ref (unique)" required />
+                <input type="number" name="number" placeholder="Race Number (optional)" />
+                <input type="text" name="code" placeholder="3-Letter Code" maxlength="3" />
+                <input type="text" name="forename" placeholder="Forename" required />
+                <input type="text" name="surname" placeholder="Surname" required />
+                <input type="date" name="dob" required />
+                <input type="text" name="nationality" placeholder="Nationality" required />
+                <input type="url" name="url" placeholder="Wiki URL" />
+                <button type="submit">Add Driver</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        let allDrivers = [];
+
+        function renderDrivers(drivers) {
+            const list = document.getElementById("driverList");
+            list.innerHTML = '';
+            drivers.forEach(d => {
+                const div = document.createElement("div");
+                div.className = "driver-card";
+                div.innerHTML = `
+                <button onclick="toggleEdit(${d.driverId})" class="icon-btn edit-btn">✎</button>
+                <button onclick="deleteDriver(${d.driverId})" class="icon-btn delete-btn">🗑️</button>
+  <div id="driverDisplay-${d.driverId}">
+    <strong>${d.forename} ${d.surname}</strong><br>
+    ${d.nationality || '--'} | Code: ${d.code || '--'} | No: ${d.number || '--'}<br>
+    DOB: ${d.dob || '--'}<br>
+    ${d.url ? `<a href="${d.url}" style="color:#3fa3ff;" target="_blank">Profile</a>` : '--'}
+    </div>
+
+  <form id="editForm-${d.driverId}" style="display:none; margin-top:10px;" onsubmit="submitEdit(event, ${d.driverId})">
+    <input type="text" name="driverRef" value="${d.driverRef}" required>
+    <input type="number" name="number" value="${d.number || ''}">
+    <input type="text" name="code" value="${d.code || ''}">
+    <input type="text" name="forename" value="${d.forename}" required>
+    <input type="text" name="surname" value="${d.surname}" required>
+    <input type="date" name="dob" value="${formatDate(d.dob)}" required>
+    <input type="text" name="nationality" value="${d.nationality}" required>
+    <input type="url" name="url" value="${d.url || ''}">
+    <button type="submit">💾 Save</button>
+  </form>
+`;
+
+
+                list.appendChild(div);
+            });
+        }
+
+        function filterDrivers(query) {
+            query = query.toLowerCase();
+            const filtered = allDrivers.filter(d =>
+                `${d.forename} ${d.surname}`.toLowerCase().includes(query) ||
+                d.nationality.toLowerCase().includes(query)
+            );
+            renderDrivers(filtered);
+        }
+
+        // Load all drivers on page load
+        fetch("/api/drivers")
+            .then(res => res.json())
+            .then(data => {
+                allDrivers = data;
+                renderDrivers(allDrivers);
+            });
+
+        document.getElementById("filterInput").addEventListener("input", e => {
+            filterDrivers(e.target.value);
+        });
+
+        // Handle add driver form
+        document.getElementById("addDriverForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const form = e.target;
+            const data = Object.fromEntries(new FormData(form).entries());
+
+            fetch("/api/add-driver", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(() => {
+                    alert("Driver added!");
+                    form.reset();
+                    return fetch("/api/drivers");
+                })
+                .then(res => res.json())
+                .then(data => {
+                    allDrivers = data;
+                    renderDrivers(allDrivers);
+                });
+        });
+    </script>
+
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
+</body>
+
+</html>

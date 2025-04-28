@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Circuits | Drive to Survive</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .circuit {
+      margin: 15px auto;
+      width: 90%;
+      background-color: #181818;
+      border: 1px solid #3498db;
+      border-radius: 10px;
+      padding: 15px 25px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.1);
+      transition: background 0.3s, transform 0.2s;
+      position: relative;
+    }
+
+    .circuit:hover {
+      background-color: #222;
+      transform: scale(1.01);
+    }
+
+    .lap-info {
+      display: none;
+      padding: 10px 20px;
+      font-weight: normal;
+      font-size: 16px;
+    }
+
+    .lap-info p {
+      margin: 4px 0;
+      padding-left: 10px;
+      border-left: 2px solid #3498db;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  {% include "navbar.html" %}
+
+  <main style="padding: 20px;">
+    <h2>🛣️ Fastest Laps by Circuit</h2>
+    <div id="circuitsContainer"></div>
+  </main>
+
+  <script>
+    fetch("/api/circuits-fastest-laps")
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById("circuitsContainer");
+        data.forEach(circuit => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "circuit";
+
+          
+          const header = document.createElement("h3");
+          header.textContent = circuit.circuit;
+          wrapper.appendChild(header);
+
+          const lapDiv = document.createElement("div");
+          lapDiv.className = "lap-info";
+
+          const line = document.createElement("p");
+          line.textContent = `🏎️ ${circuit.driver} - 🕒 ${circuit.lap_time}`;
+          lapDiv.appendChild(line);
+
+          wrapper.appendChild(lapDiv);
+
+          wrapper.addEventListener("click", () => {
+            lapDiv.style.display = lapDiv.style.display === "block" ? "none" : "block";
+          });
+
+          container.appendChild(wrapper);
+        });
+      });
+  </script>
+</body>
+</html>

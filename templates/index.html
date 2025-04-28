@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drive to Survive</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- ✅ Correct static file loading -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</head>
+
+<body>
+  <img id="ferrari" src="{{ url_for('static', filename='assets/th1.jpeg') }}" alt="Ferrari Car">
+  <audio id="f1Audio" preload="auto" src="{{ url_for('static', filename='assets/f1_sound.mp3') }}"></audio>
+
+<!-- 🔊 Volume Button -->
+<button id="volumeButton" style="
+  position: fixed;
+  top: 120px;
+  right: 30px;
+  background-color: #111;
+  color: white;
+  font-size: 24px;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  z-index: 999;
+">
+  🔊
+</button>
+
+<header>
+  <div class="header-left">
+    <a href="/"><button>Home</button></a>
+    <a href="/analysis"><button>Analysis</button></a>
+    <a href="/teams"><button>Team</button></a>
+    <a href="/circuits"><button>Circuits</button></a>
+    <a href="/drivers"><button>Driver</button></a>
+    <a href="/schedule"><button>Schedule</button></a>
+  </div>
+  <div class="header-right">
+    <span class="f1-logo">F1</span>
+    <span class="company-name">DRIVE TO SURVIVE</span>
+  </div>
+</header>
+
+
+  <main>
+    <img id="ferrari" src="assests/th1.jpeg" alt="Ferrari Car" />
+    <article id="race-article">
+      <p>
+        Drive to Survive is a project in which its primary goal is to provide an online platform to analyse and access Formula 1 race. To know about the circuits, drivers, and the teams taking part for the year. You can see which driver is at the top of the standing and the team as well.
+      </p>
+      <hr style="margin: 60px auto; width: 75%; border: 1px solid red;" />
+    </article>
+
+
+    <section id="aboutF1Section" style="display: none; padding: 20px 50px 50px 50px; color: white; margin-top: -20px;">
+      <h2 style="text-align: center;">🏎️ About Formula 1</h2>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px;">
+        
+        <div style="background: #111; padding: 20px; border-radius: 10px; border: 1px solid red;">
+          <h3>📜 Origins (1950)</h3>
+          <p>Formula 1 officially began in 1950 with the first World Championship race at Silverstone, UK. It evolved from European Grand Prix racing that had been popular in the 1920s and 30s. The first official F1 World Champion was Giuseppe Farina driving for Alfa Romeo.</p>
+        </div>
+        
+        <div style="background: #111; padding: 20px; border-radius: 10px; border: 1px solid red;">
+          <h3>🏆 Evolution Over Time</h3>
+          <p>Through the decades, F1 introduced incredible technology, aerodynamics, and turbocharged engines. Iconic drivers like Ayrton Senna, Alain Prost, Michael Schumacher and Lewis Hamilton set records and brought global fame. Safety also dramatically improved after the dangerous eras of the 60s and 70s.</p>
+        </div>
+        
+        <div style="background: #111; padding: 20px; border-radius: 10px; border: 1px solid red;">
+          <h3>🚀 F1 Today</h3>
+          <p>Today, Formula 1 is a worldwide phenomenon with millions of fans. Teams like Mercedes, Ferrari, Red Bull, and McLaren battle in a 24-race calendar across 5 continents, pushing technology, sustainability, and innovation to new levels.</p>
+        </div>
+    
+      </div>
+    </section>
+    
+    
+      </main>
+    
+   
+</body>
+</html>

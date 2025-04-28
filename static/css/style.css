@@ -1,0 +1,157 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  header {
+    background-color: red;
+    padding: 30px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header-left button {
+    margin-right: 20px;
+    background: none;
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .header-left button:hover {
+    transform: scale(1.1);
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .f1-logo {
+    font-size: 30px;
+    font-weight: 900;
+    font-family: 'Arial Black', sans-serif;
+    letter-spacing: 2px;
+    color: white;
+  }
+  
+  .company-name {
+    font-size: 20px;
+    font-weight: bold;
+    font-style: italic;
+    color: white;
+  }
+  
+  
+  #race-article {
+    max-width: 700px;
+    margin: 300px auto 0;
+    display: none;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+ .f1-logo {
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  #ferrari {
+    position: absolute;
+    top: 180px;
+    left: -500px;
+    width: 500px;
+    transition: left 4s linear; 
+  }
+  
+  #volumeButton:hover {
+    background-color: red;
+    transform: scale(1.1);
+    transition: all 0.1s ease;
+  }
+    
+  .team {
+    margin: 15px auto;
+    width: 90%;
+    background-color: #181818;
+    border: 1px solid #ff2d2d;
+    border-radius: 10px;
+    padding: 15px 25px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 0, 0, 0.1);
+    transition: background 0.3s, transform 0.2s;
+    position: relative;
+  }
+  
+  .team:hover {
+    background-color: #222;
+    transform: scale(1.01);
+  }
+  
+  .driver-list {
+    display: none;
+    padding: 10px 20px;
+    font-weight: normal;
+    font-size: 16px;
+  }
+  
+  .driver-list p {
+    margin: 4px 0;
+    padding-left: 10px;
+    border-left: 2px solid #ff5555;
+    color: #ccc;
+  }
+  
+  .driver-card {
+    position: relative; /* This is essential! */
+    border: 1px solid red;
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin: 10px auto;
+    background: #111;
+    color: white;
+    max-width: 800px;
+    overflow: hidden; /* Just in case icons spill */
+  }
+  
+  .icon-btn {
+    position: absolute;
+    top: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #ccc;
+    transition: transform 0.2s ease;
+    z-index: 10;
+  }
+  
+  .edit-btn {
+    right: 50px; /* 👈 enough space from the right */
+  }
+  
+  .delete-btn {
+    right: 10px;
+  }
+  
+  .icon-btn:hover {
+    transform: scale(1.2);
+    color: red;
+  }
+  
+  #aboutF1Section div:hover {
+    background-color: #222;
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+  }
+  

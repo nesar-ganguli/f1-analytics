@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teams | Drive to Survive</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .team {
+      margin: 15px 30px;
+      border: 1px solid red;
+      border-radius: 6px;
+      padding: 10px;
+      background: #111;
+      cursor: pointer;
+    }
+    .driver-list {
+      display: none;
+      padding: 10px 20px;
+    }
+    .team:hover {
+      background: #222;
+    }
+  </style>
+</head>
+<body>
+  {% include "navbar.html" %}
+
+  <main style="padding: 20px;">
+    <h2>🏁 Teams </h2>
+    <div id="teamsContainer"></div>
+  </main>
+
+  <script>
+    fetch("/api/teams-drivers")
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById("teamsContainer");
+        data.forEach(teamObj => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "team";
+
+          const header = document.createElement("h3");
+          header.textContent = teamObj.team;
+          wrapper.appendChild(header);
+
+          const driverDiv = document.createElement("div");
+          driverDiv.className = "driver-list";
+
+          teamObj.drivers.forEach(driver => {
+            const line = document.createElement("p");
+            line.textContent = `${driver.name}: ${driver.points.toFixed(1)} pts`;
+            driverDiv.appendChild(line);
+          });
+
+          wrapper.appendChild(driverDiv);
+
+          // Toggle show/hide
+          wrapper.addEventListener("click", () => {
+            driverDiv.style.display = driverDiv.style.display === "none" ? "block" : "none";
+          });
+
+          container.appendChild(wrapper);
+        });
+      });
+  </script>
+</body>
+</html>

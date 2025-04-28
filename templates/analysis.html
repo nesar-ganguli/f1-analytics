@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Analysis | Drive to Survive</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Basic Tab Styling */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background-color: #111;
+            padding: 10px 0;
+            margin-top: 0;
+        }
+
+        .tab-btn {
+            background-color: #222;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0 10px;
+            border-radius: 5px;
+        }
+
+        .tab-btn.active {
+            background-color: red;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px 50px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-left">
+            <a href="/"><button>Home</button></a>
+            <a href="/analysis"><button>Analysis</button></a>
+            <a href="/teams"><button>Team</button></a>
+            <a href="/circuits"><button>Circuits</button></a>
+            <a href="/drivers"><button>Driver</button></a>
+          </div>
+          <div class="header-right">
+            <span class="f1-logo">F1</span>
+            <span class="company-name">DRIVE TO SURVIVE</span>
+          </div>
+    </header>
+
+    <!-- 🔽 Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('champions')">Season Champions</button>
+        <button class="tab-btn" onclick="showTab('constructors')">Top Constructors</button>
+        <button class="tab-btn" onclick="showTab('pitstops')">Fastest Pit Stops</button>
+    </div>
+
+    <!-- 🔽 Tab Contents -->
+    <div id="champions" class="tab-content active">
+        <h2 style="text-align: center;">🏆 Season Champions</h2>
+        <canvas id="championChart" width="900" height="400"></canvas>
+        <p id="chart-status" style="text-align: center;"></p>
+    </div>
+
+    <div id="constructors" class="tab-content">
+        <h2 style="text-align: center;">🏁 Top Constructors</h2>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+            <label for="yearSelect">Select Season:</label>
+            <select id="yearSelect" onchange="loadConstructorsByYear(this.value)">
+                <!-- Years will be inserted dynamically -->
+            </select>
+        </div>
+
+        <canvas id="constructorChart" width="900" height="400"></canvas>
+    </div>
+
+    <div id="pitstops" class="tab-content">
+        <h2 style="text-align: center;">🔧 Fastest Pit Stops</h2>
+        <canvas id="pitstopChart" width="900" height="400"></canvas>
+    </div>
+
+    <script>
+        // Tab Switching
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+
+        // Load Chart on Page Load
+        fetch("/api/season-champions")
+            .then(res => res.json())
+            .then(data => {
+                if (!data.length) {
+                    document.getElementById("chart-status").innerText = "No data found.";
+                    return;
+                }
+
+                const labels = data.map(item => item.year);
+                const points = data.map(item => item.points);
+                const names = data.map(item => item.forename + " " + item.surname);
+
+                new Chart(document.getElementById("championChart"), {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Champion Points",
+                            data: points,
+                            backgroundColor: "rgba(255, 99, 132, 0.6)"
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return names[context.dataIndex] + ": " + context.raw + " pts";
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                document.getElementById("chart-status").innerText = "Chart loaded ✅";
+            })
+            .catch(err => {
+                console.error("Chart fetch failed:", err);
+                document.getElementById("chart-status").innerText = "Failed to load chart ❌";
+            });
+
+        fetch("/api/top-constructors")
+            .then(res => res.json())
+            .then(data => {
+                const labels = data.map(row => row.name);
+                const points = data.map(row => row.points);
+
+                new Chart(document.getElementById("constructorChart"), {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Total Points",
+                            data: points,
+                            backgroundColor: "rgba(54, 162, 235, 0.6)"
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            });
+
+        fetch("/api/fastest-pitstops")
+            .then(res => res.json())
+            .then(data => {
+                const labels = data.map(d => d.forename + " " + d.surname);
+                const times = data.map(d => d.milliseconds);
+
+                new Chart(document.getElementById("pitstopChart"), {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Pit Stop Time (ms)",
+                            data: times,
+                            backgroundColor: "rgba(75, 192, 192, 0.6)"
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            });
+
+
+    </script>
+    <script>
+        const constructorChartCtx = document.getElementById("constructorChart").getContext("2d");
+        let constructorChart;
+
+        function loadConstructorsByYear(year) {
+            fetch(`/api/top-constructors/${year}`)
+                .then(res => res.json())
+                .then(data => {
+                    const labels = data.map(row => row.name);
+                    const points = data.map(row => row.points);
+
+                    if (constructorChart) constructorChart.destroy(); // reset old chart
+
+                    constructorChart = new Chart(constructorChartCtx, {
+                        type: "bar",
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: `Points in ${year}`,
+                                data: points,
+                                backgroundColor: "rgba(54, 162, 235, 0.6)"
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                });
+        }
+
+        fetch("/api/seasons")
+            .then(res => res.json())
+            .then(years => {
+                const yearSelect = document.getElementById("yearSelect");
+                years.forEach(year => {
+                    const option = document.createElement("option");
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelect.appendChild(option);
+                });
+                loadConstructorsByYear(years[0]); // load most recent year by default
+            });
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Schedule | Drive to Survive</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    #scheduleContainer {
+      padding: 30px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .race-card {
+      border: 1px solid red;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      background: #111;
+      color: white;
+    }
+    .race-card:hover {
+      background: #222;
+    }
+  </style>
+</head>
+<body>
+  {% include "navbar.html" %}
+
+  <main id="scheduleContainer">
+    <h2 style="text-align:center;">🏁 2025 Season Schedule</h2>
+    <div id="raceList"></div>
+  </main>
+
+  <script>
+    function formatRaceDate(dateStr) {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    fetch("/api/schedule")
+      .then(res => res.json())
+      .then(data => {
+        const raceList = document.getElementById("raceList");
+        raceList.innerHTML = '';
+        data.forEach(race => {
+          const div = document.createElement("div");
+          div.className = "race-card";
+          div.innerHTML = `
+            <strong>Round ${race.round}: ${race.raceName}</strong><br>
+            🏟️ Circuit: ${race.circuitName}<br>
+            🌍 Country: ${race.country}<br>
+            📅 Date: ${formatRaceDate(race.date)}
+          `;
+          raceList.appendChild(div);
+        });
+      });
+  </script>
+
+</body>
+</html>
