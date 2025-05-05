@@ -67,7 +67,7 @@
         <input type="text" id="filterInput" placeholder="Search by driver name or nationality..." />
         <div id="driverList"></div>
 
-        <div class="form-container">
+        <div id="addDriverContainer" class="form-container" style="display: none;">
             <h3 style="color:white;">➕ Add New Driver</h3>
             <form id="addDriverForm">
                 <input type="text" name="driverRef" placeholder="Driver Ref (unique)" required />
@@ -87,38 +87,40 @@
         let allDrivers = [];
 
         function renderDrivers(drivers) {
-            const list = document.getElementById("driverList");
-            list.innerHTML = '';
-            drivers.forEach(d => {
-                const div = document.createElement("div");
-                div.className = "driver-card";
-                div.innerHTML = `
-                <button onclick="toggleEdit(${d.driverId})" class="icon-btn edit-btn">✎</button>
-                <button onclick="deleteDriver(${d.driverId})" class="icon-btn delete-btn">🗑️</button>
-  <div id="driverDisplay-${d.driverId}">
-    <strong>${d.forename} ${d.surname}</strong><br>
-    ${d.nationality || '--'} | Code: ${d.code || '--'} | No: ${d.number || '--'}<br>
-    DOB: ${d.dob || '--'}<br>
-    ${d.url ? `<a href="${d.url}" style="color:#3fa3ff;" target="_blank">Profile</a>` : '--'}
-    </div>
+    const list = document.getElementById("driverList");
+    list.innerHTML = '';
+    drivers.forEach(d => {
+        const div = document.createElement("div");
+        div.className = "driver-card";
+        div.innerHTML = `
+        <button onclick="toggleEdit(${d.driverId})" class="icon-btn edit-btn">✎</button>
+        <button onclick="deleteDriver(${d.driverId})" class="icon-btn delete-btn">🗑️</button>
+        <div id="driverDisplay-${d.driverId}">
+            <strong>${d.forename} ${d.surname}</strong><br>
+            ${d.nationality || '--'} | Code: ${d.code || '--'} | No: ${d.number || '--'}<br>
+            DOB: ${d.dob || '--'}<br>
+            ${d.url ? `<a href="${d.url}" style="color:#3fa3ff;" target="_blank">Profile</a>` : '--'}
+        </div>
+        <form id="editForm-${d.driverId}" style="display:none; margin-top:10px;" onsubmit="submitEdit(event, ${d.driverId})">
+            <input type="text" name="driverRef" value="${d.driverRef}" required>
+            <input type="number" name="number" value="${d.number || ''}">
+            <input type="text" name="code" value="${d.code || ''}">
+            <input type="text" name="forename" value="${d.forename}" required>
+            <input type="text" name="surname" value="${d.surname}" required>
+            <input type="date" name="dob" value="${formatDate(d.dob)}" required>
+            <input type="text" name="nationality" value="${d.nationality}" required>
+            <input type="url" name="url" value="${d.url || ''}">
+            <button type="submit">💾 Save</button>
+        </form>
+        `;
+        list.appendChild(div);
+    });
 
-  <form id="editForm-${d.driverId}" style="display:none; margin-top:10px;" onsubmit="submitEdit(event, ${d.driverId})">
-    <input type="text" name="driverRef" value="${d.driverRef}" required>
-    <input type="number" name="number" value="${d.number || ''}">
-    <input type="text" name="code" value="${d.code || ''}">
-    <input type="text" name="forename" value="${d.forename}" required>
-    <input type="text" name="surname" value="${d.surname}" required>
-    <input type="date" name="dob" value="${formatDate(d.dob)}" required>
-    <input type="text" name="nationality" value="${d.nationality}" required>
-    <input type="url" name="url" value="${d.url || ''}">
-    <button type="submit">💾 Save</button>
-  </form>
-`;
+    // Show form only if no drivers match
+    const formContainer = document.getElementById("addDriverContainer");
+    formContainer.style.display = drivers.length === 0 ? "block" : "none";
+}
 
-
-                list.appendChild(div);
-            });
-        }
 
         function filterDrivers(query) {
             query = query.toLowerCase();

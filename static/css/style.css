@@ -149,9 +149,35 @@ body {
     color: red;
   }
   
-  #aboutF1Section div:hover {
-    background-color: #222;
-    transform: scale(1.02);
-    transition: all 0.3s ease;
-  }
+/* Card hover effect for ALL F1 info sections */
+section div:hover {
+  background-color: #222;
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
   
+  #f1InfoContainer {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+  }
+
+  #f1InfoContainer.show {
+    opacity: 1;
+  }
+
+  /* Smooth fade-in setup for article and about section */
+#race-article,
+#aboutF1Section,
+#f1InfoContainer {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1s ease-out, transform 0.8s ease-out;
+}
+
+#race-article.show,
+#aboutF1Section.show,
+#f1InfoContainer.show {
+  opacity: 1;
+  transform: translateY(0);
+}

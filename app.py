@@ -74,17 +74,26 @@ def fastest_pitstops():
 def top_constructors_by_year(year):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT C.name, SUM(CS.points) AS points
+
+    query = """
+        SELECT C.name, CS.points
         FROM ConstructorStandings CS
         JOIN Constructors C ON CS.constructorId = C.constructorId
         JOIN Races R ON CS.raceId = R.raceId
         WHERE R.year = %s
-        GROUP BY CS.constructorId
-        ORDER BY points DESC
+          AND R.raceId = (
+              SELECT MAX(raceId)
+              FROM Races
+              WHERE year = %s
+          )
+        ORDER BY CS.points DESC
         LIMIT 10;
-    """, (year,))
-    return jsonify(cursor.fetchall())
+    """
+
+    cursor.execute(query, (year, year))
+    results = cursor.fetchall()
+    return jsonify(results)
+
 
 @app.route("/api/seasons")
 def get_seasons():
@@ -254,20 +263,11 @@ def schedule_page():
 
 @app.route("/api/schedule")
 def get_schedule():
-    response = requests.get("https://ergast.com/api/f1/current.json")
-    data = response.json()
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM F1_2025_Schedule ORDER BY date;")
+    return jsonify(cursor.fetchall())
 
-    races = data['MRData']['RaceTable']['Races']
-    schedule = []
-    for race in races:
-        schedule.append({
-            "round": race["round"],
-            "raceName": race["raceName"],
-            "circuitName": race["Circuit"]["circuitName"],
-            "country": race["Circuit"]["Location"]["country"],
-            "date": race["date"]
-        })
-    return schedule
 
 @app.route('/api/f1-news')
 def get_f1_news():
@@ -279,10 +279,45 @@ def get_f1_news():
       response = requests.get(url, headers=headers)
       return jsonify(response.json())
     
+@app.route("/api/most-poles")
+def most_poles():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = """
+        SELECT D.forename, D.surname, COUNT(*) AS pole_count
+        FROM Qualifying Q
+        JOIN Drivers D ON Q.driverId = D.driverId
+        WHERE Q.position = 1
+        GROUP BY Q.driverId
+        ORDER BY pole_count DESC
+        LIMIT 10;
+    """
+    cursor.execute(query)
+    return jsonify(cursor.fetchall())
+
+
+@app.route("/api/points-over-season/<int:driver_id>/<int:year>")
+def points_over_season(driver_id, year):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = """
+        SELECT R.round, DS.points
+        FROM DriverStandings DS
+        JOIN Races R ON DS.raceId = R.raceId
+        WHERE DS.driverId = %s AND R.year = %s
+        ORDER BY R.round
+    """
+    cursor.execute(query, (driver_id, year))
+    return jsonify(cursor.fetchall())
+
 
 if __name__ == "__main__":
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="0.0.0.0", port=port)
-# minor update for redeploy
+    app.run(debug=True, port=5099)
 
+# if __name__ == "__main__":
+#     import os
+#     port = int(os.environ.get("PORT", 5000))
+#     app.run(debug=True, host="0.0.0.0", port=port)
+# minor update for redeploy

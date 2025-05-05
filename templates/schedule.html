@@ -17,6 +17,7 @@
       margin: 20px 0;
       background: #111;
       color: white;
+      transition: background 0.3s ease;
     }
     .race-card:hover {
       background: #222;
@@ -42,12 +43,12 @@
       .then(data => {
         const raceList = document.getElementById("raceList");
         raceList.innerHTML = '';
-        data.forEach(race => {
+        data.forEach((race, index) => {
           const div = document.createElement("div");
           div.className = "race-card";
           div.innerHTML = `
-            <strong>Round ${race.round}: ${race.raceName}</strong><br>
-            🏟️ Circuit: ${race.circuitName}<br>
+            <strong>Round ${index + 1}: ${race.grand_prix}</strong><br>
+            🏟️ Circuit: ${race.circuit}<br>
             🌍 Country: ${race.country}<br>
             📅 Date: ${formatRaceDate(race.date)}
           `;
